@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_Mahommadali_Ecom_1700716272539-push-trigger-input-set
+  identifier: Build_Mahommadali_Ecom_1700716272539pushtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: Build_Mahommadali_Ecom_1700716272539
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: <+trigger.branch>
