@@ -1,0 +1,74 @@
+pipeline:
+  name: cd
+  identifier: cd
+  projectIdentifier: dc0
+  orgIdentifier: default
+  tags: {}
+  stages:
+    - stage:
+        name: dc
+        identifier: dc
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: AzureWebApp
+          service:
+            serviceRef: cd
+          environments:
+            metadata:
+              parallel: true
+            values:
+              - environmentRef: cd
+                deployToAll: true
+                infrastructureDefinitions: <+input>
+          execution:
+            steps:
+              - step:
+                  name: Slot Deployment
+                  identifier: slotDeployment
+                  type: AzureSlotDeployment
+                  timeout: 20m
+                  spec:
+                    webApp: AZURE1_group
+                    deploymentSlot: https://portal.azure.com/#blade/HubsExtension/DeploymentDetailsBlade/id/%2Fsubscriptions%2F3b254f0d-a654-4eee-98e4-d44eb1544272%2FresourceGroups%2FAZURE1_group%2Fproviders%2FMicrosoft.Resources%2Fdeployments%2FCreateVm-microsoftwindowsdesktop.windows-11-win11-20231101104727/primaryResourceId/%2Fsubscriptions%2F3b254f0d-a654-4eee-98e4-d44eb1544272%2Fresourcegroups%2FAZURE1_group%2Fproviders%2FMicrosoft.Compute%2FvirtualMachines%2FAZURE1
+                    clean: true
+            rollbackSteps:
+              - step:
+                  name: WebApp rollback
+                  identifier: webAppRollback
+                  type: AzureWebAppRollback
+                  timeout: 20m
+                  spec: {}
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
+    - stage:
+        name: c
+        identifier: c
+        description: ""
+        type: Approval
+        spec:
+          execution:
+            steps:
+              - step:
+                  name: c
+                  identifier: c
+                  type: HarnessApproval
+                  timeout: 1d
+                  spec:
+                    approvalMessage: |-
+                      Please review the following information
+                      and approve the pipeline progression
+                    includePipelineExecutionHistory: true
+                    approvers:
+                      minimumCount: 1
+                      disallowPipelineExecutor: false
+                      userGroups:
+                        - account._account_all_users
+                    isAutoRejectEnabled: true
+                    approverInputs: []
+        tags: {}
